@@ -5,7 +5,7 @@
 | Configured segments | 26 rows in `traffic.segments` | Show as sample points |
 | Coordinate verification | 0 of 26 marked verified | Explicitly unverified |
 | Traffic readings | 0 rows at last database audit | No live observations |
-| TomTom poller | Edge Function v5 deployed | Do not use for Ghana |
+| TomTom poller | Edge Function v6 deployed; returns 503 provider_not_supported_in_market | Do not use for Ghana |
 | TomTom Traffic Flow coverage | Ghana absent from published coverage list | Provider rejected for this market |
 | TomTom cron job | Inactive, preserved | No repeated unsupported requests |
 | Retention cron job | Active; 14-day retention | Preserve cleanup |
