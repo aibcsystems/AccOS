@@ -14,11 +14,12 @@ An early-stage corridor intelligence workspace for Accra, Ghana. AccOS separates
 
 - Supabase project: `jgmpodbamtqhofdocvdo`, region `eu-west-2`, PostgreSQL 17.11.
 - 26 configured road sample points; 0 marked geographically verified.
-- `traffic.readings` contains 0 live readings.
-- `traffic-poll` Edge Function is deployed and scheduled every 15 minutes.
-- Recent poll responses report `inserted: 0` and `http_401: 26` from TomTom. The function's own HTTP 200 response is not evidence of successful provider ingestion.
-- The configured `TOMTOM_API_KEY` environment value is malformed for this provider request (670 characters) and must be replaced with a valid credential. The secret is not included here.
-- Do not market this as a live traffic service until a valid provider credential, Ghana coverage and actual inserted observations have been verified.
+- `traffic.readings` contains 0 live readings at the last audit.
+- `traffic-poll` Edge Function v5 is deployed, but its 15-minute cron job is now inactive.
+- Recent TomTom requests returned HTTP 401 for all 26 sample points.
+- TomTom's published Traffic API market-coverage list does not include Ghana. Correcting the malformed key alone would not establish Accra coverage.
+- Google Maps Platform lists Ghana for Traffic Layer and Driving Directions / Snap to Roads. Google Routes API traffic-aware duration is a promising candidate for limited corridor-level estimates, not direct segment speed observations.
+- No Google provider credential has been configured and no Google traffic data has been ingested.
 
 All 26 coordinates are currently unverified sample points, not surveyed road geometries. Missing readings are shown as missing, never fabricated.
 
@@ -30,15 +31,17 @@ Serve this directory with a static HTTP server, e.g. `python3 -m http.server 808
 
 The client calls `public.get_accos_live_traffic()`, a narrow `SECURITY INVOKER` SQL function. The function returns segment metadata and the latest 30-minute view only. Underlying tables retain RLS with SELECT-only policies for `anon` and `authenticated`; the browser has no insert, update or delete access. The `traffic` schema remains outside the configured PostgREST exposed-schema list, so the public RPC is the intended client entry point.
 
-`config.js` contains only the Supabase URL and publishable key. Never put `service_role`, secret API keys, TomTom credentials or database passwords in frontend files.
+`config.js` contains only the Supabase URL and publishable key. Never put `service_role`, secret API keys, Google Maps API keys or database passwords in frontend files.
 
-## Recovery checklist
+## Recovery and next-provider plan
 
-1. Replace the invalid `TOMTOM_API_KEY` Edge Function secret securely.
-2. Confirm TomTom Traffic Flow returns valid `flowSegmentData` for Ghana coordinates and the account has the required product access.
-3. Run a controlled poll and verify inserted rows, speed/free-flow values and timestamps.
-4. Verify each segment coordinate against trusted road geometry before setting its `verified` flag.
-5. Re-run Supabase security advisors and inspect Edge Function logs.
+1. Do not continue rotating TomTom credentials for Ghana unless TomTom confirms Traffic Flow access in writing.
+2. Validate the origin/destination points for a small set of Accra corridors against trusted road geometry.
+3. Create a Google Cloud project, enable Routes API, configure billing, restrict the key to Routes API and set quotas/budget alerts.
+4. Store the key only as an Edge Function secret.
+5. Test a few `TRAFFIC_AWARE` routes and verify `duration`, `staticDuration` and `distanceMeters`.
+6. Store route-level estimates in a separate table, not `traffic.readings`.
+7. Re-run Supabase security advisors and end-to-end checks before release.
 
 ## Product boundary
 
