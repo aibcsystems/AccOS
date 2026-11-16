@@ -1,0 +1,30 @@
+name: AccOS validation
+
+on:
+  pull_request:
+  push:
+    branches: [main, feat/live-traffic-platform-foundation]
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check application JavaScript syntax
+        run: node --check app.js
+      - name: Parse dashboard HTML
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          parser = HTMLParser()
+          parser.feed(Path("index.html").read_text())
+          parser.close()
+          print("index.html parsed successfully")
+          PY
