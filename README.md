@@ -15,7 +15,7 @@ An early-stage corridor intelligence workspace for Accra, Ghana. AccOS separates
 - Supabase project: `jgmpodbamtqhofdocvdo`, region `eu-west-2`, PostgreSQL 17.11.
 - 26 configured road sample points; 0 marked geographically verified.
 - `traffic.readings` contains 0 live readings at the last audit.
-- `traffic-poll` Edge Function v5 is deployed, but its 15-minute cron job is now inactive.
+- `traffic-poll` Edge Function v6 is deployed in fail-closed mode, but its 15-minute cron job is now inactive.
 - Recent TomTom requests returned HTTP 401 for all 26 sample points.
 - TomTom's published Traffic API market-coverage list does not include Ghana. Correcting the malformed key alone would not establish Accra coverage.
 - Google Maps Platform lists Ghana for Traffic Layer and Driving Directions / Snap to Roads. Google Routes API traffic-aware duration is a promising candidate for limited corridor-level estimates, not direct segment speed observations.
